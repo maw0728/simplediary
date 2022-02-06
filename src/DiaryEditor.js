@@ -38,12 +38,13 @@ const DiaryEditor = () => {
         <div className="DiaryEditor">
             <h2>오늘의 일기</h2>
             <div>
-                <input ref={authorInput} name="author" value={state.author} onChange={(e) => {
-                    setState({
-                        ...state,
-                        author: e.target.value,
-                    });
-                }}/>
+                <input ref={authorInput} name="author" value={state.author}
+                       onChange={(e) => {
+                           setState({
+                               ...state,
+                               author: e.target.value,
+                           });
+                       }}/>
                 <div>
                     <textarea ref={contentInput} name="content" value={state.content} onChange={handleChangeState}/>
                 </div>
