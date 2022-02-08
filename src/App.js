@@ -1,7 +1,7 @@
 import './App.css';
 import DiaryEditor from "./DiaryEditor";
 import DiaryList from "./DiaryList";
-import {useEffect, useRef, useState} from "react";
+import {useEffect, useMemo, useRef, useState} from "react";
 import Lifecycle from "./Lifecycle";
 
 // https://jsonplaceholder.typicode.com/posts
@@ -59,11 +59,7 @@ function App() {
     const onCreate = (author, content, emotion) => {
         const create_date = new Date().getTime();
         const newItem = {
-            author,
-            content,
-            emotion,
-            create_date,
-            id: dataId.current
+            author, content, emotion, create_date, id: dataId.current
         }
         dataId.current += 1;
         setData([newItem, ...data])
@@ -73,19 +69,32 @@ function App() {
         const newDiaryList = data.filter((it) => it.id !== targetId);
         console.log(newDiaryList);
         setData(newDiaryList);
-    }
+    };
 
     const onEdit = (targetId, newContent) => {
         setData(data.map(it => it.id === targetId ? {...it, content: newContent} : it));
     };
 
-    return (
-        <div className="App">
-            <Lifecycle/>
-            <DiaryEditor onCreate={onCreate}/>
-            <DiaryList onEdit={onEdit} onRemove={onRemove} diaryList={data}/>
-        </div>
-    );
+    const getDiaryAnalysis = useMemo(() => {
+        console.log('일기 분석 시작');
+
+        const goodCount = data.filter(it => it.emotion >= 3).length;
+        const badCount = data.length - goodCount;
+        const goodRatio = (goodCount / data.length) * 100;
+        return {goodCount, badCount, goodRatio};
+    }, [data.length])
+
+    const {goodCount, badCount, goodRatio} = getDiaryAnalysis;
+
+    return (<div className="App">
+        <Lifecycle/>
+        <DiaryEditor onCreate={onCreate}/>
+        <div>전체 일기 : {data.length}</div>
+        <div>기분 좋은 일기 개수 : {goodCount}</div>
+        <div>기분 나쁜 일기 개수 : {badCount}</div>
+        <div>기분 좋은 일기 비율 : {goodRatio}</div>
+        <DiaryList onEdit={onEdit} onRemove={onRemove} diaryList={data}/>
+    </div>);
 }
 
 export default App;
